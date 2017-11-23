@@ -1,0 +1,3 @@
+recursive-include pretix_bounces/static *
+recursive-include pretix_bounces/templates *
+recursive-include pretix_bounces/locale *
