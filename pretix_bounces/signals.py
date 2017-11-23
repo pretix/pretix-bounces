@@ -59,6 +59,7 @@ def get_bounces_via_imap(sender, **kwargs):
                     'subject': msg['Subject'],
                     'message': get_content(msg),
                     'sender': msg['Sender'],
+                    'full_mail': data[0][1].decode()
                 }
             )
     imap.close()

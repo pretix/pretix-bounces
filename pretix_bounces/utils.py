@@ -22,9 +22,9 @@ def get_content(msg: Message):
         for part in msg.walk():
             if part.get_content_type() == "text/plain":
                 body = part.get_payload(decode=True)
-                plain_body = body.decode()
+                plain_body = plain_body or body.decode()
             elif part.get_content_type() == "text/html":
                 body = part.get_payload(decode=True)
-                html_body = body.decode()
+                html_body = html_body or body.decode()
         return plain_body or html_body or "Unable to parse email."
     return msg.get_payload(None, True)
