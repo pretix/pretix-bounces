@@ -17,6 +17,9 @@ def add_bounce_sender(sender, message: EmailMultiAlternatives, order, **kwargs):
     if not settings.CONFIG_FILE.has_section('bounces') or not order:
         return message
 
+    if order.event.settings.smtp_use_custom:
+        return message
+
     alias = generate_new_alias(order)
     from_email = message.from_email
 
