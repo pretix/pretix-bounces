@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-11-23 18:19+0100\n"
+"POT-Creation-Date: 2018-03-06 16:53+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Raphael Michel\n"
 "Language-Team: \n"
@@ -12,6 +12,6 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 2.0.4\n"
 
-#: pretix_bounces/signals.py:72
+#: pretix_bounces/signals.py:79
 msgid "An email reply has been received by the user."
 msgstr "Eine E-Mail wurde vom Benutzer empfangen."
