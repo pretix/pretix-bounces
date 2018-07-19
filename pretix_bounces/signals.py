@@ -55,7 +55,10 @@ def get_bounces_via_imap(sender, **kwargs):
         imap.store(num, '+FLAGS', '\\Seen')
         to = getaddresses(msg.get_all('To'))
         for name, addr in to:
-            alias = MailAlias.objects.get(sender=addr)
+            try:
+                alias = MailAlias.objects.get(sender=addr)
+            except MailAlias.DoesNotExist:
+                continue
             content = get_content(msg)
             if isinstance(content, bytes):
                 content = content.decode(errors='replace')
