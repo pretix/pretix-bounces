@@ -58,7 +58,7 @@ def get_bounces_via_imap(sender, **kwargs):
             alias = MailAlias.objects.get(sender=addr)
             content = get_content(msg)
             if isinstance(content, bytes):
-                content = content.decode()
+                content = content.decode(errors='replace')
             alias.order.log_action(
                 'pretix_bounces.order.email.received',
                 data={
