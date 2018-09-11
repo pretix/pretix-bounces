@@ -25,7 +25,7 @@ cmdclass = {
 
 setup(
     name='pretix-bounces',
-    version='1.0.1',
+    version='1.0.2',
     description='Allows automatic processing of bounces or automatic replies to emails sent by pretix.',
     long_description=long_description,
     url='https://github.com/pretix/pretix-bounces',
