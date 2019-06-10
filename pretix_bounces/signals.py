@@ -1,4 +1,7 @@
+from datetime import timedelta
+
 import email
+from django.utils.timezone import now
 from email.utils import getaddresses
 from imaplib import IMAP4_SSL
 
@@ -88,3 +91,8 @@ def pretixcontrol_logentry_display(sender, logentry, **kwargs):
 
     if event_type in plains:
         return plains[event_type]
+
+
+@receiver(periodic_task, dispatch_uid="pretix_bounces_periodic_cleanup")
+def cleanup_aliases(sender, **kwargs):
+    MailAlias.objects.filter(datetime__lt=now() - timedelta(days=90)).delete()
