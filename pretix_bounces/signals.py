@@ -2,6 +2,7 @@ from datetime import timedelta
 
 import email
 from django.utils.timezone import now
+from django_scopes import scopes_disabled
 from email.utils import getaddresses
 from imaplib import IMAP4_SSL
 
@@ -43,6 +44,7 @@ def add_bounce_sender(sender, message: EmailMultiAlternatives, order, **kwargs):
 
 
 @receiver(periodic_task, dispatch_uid="pretix_bounces_periodic")
+@scopes_disabled()
 def get_bounces_via_imap(sender, **kwargs):
     host = settings.CONFIG_FILE.get('bounces', 'server', fallback='localhost').split(":")[0]
     try:
