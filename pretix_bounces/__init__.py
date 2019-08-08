@@ -11,7 +11,7 @@ class PluginApp(AppConfig):
         author = 'Raphael Michel'
         description = 'Allows automatic processing of bounces or automatic replies to emails sent by pretix.'
         visible = False
-        version = '1.0.2'
+        version = '1.1.0'
 
     def ready(self):
         settings.CORE_MODULES.add('pretix_bounces')
