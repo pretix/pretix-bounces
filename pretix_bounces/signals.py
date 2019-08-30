@@ -132,4 +132,4 @@ def pretixcontrol_logentry_display(sender, logentry, **kwargs):
 
 @receiver(periodic_task, dispatch_uid="pretix_bounces_periodic_cleanup")
 def cleanup_aliases(sender, **kwargs):
-    MailAlias.objects.filter(datetime__lt=now() - timedelta(days=90)).delete()
+    MailAlias.objects.filter(datetime__lt=now() - timedelta(days=90), user__isnull=True).delete()
