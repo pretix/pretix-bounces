@@ -45,7 +45,7 @@ def add_bounce_sender(sender, message: EmailMultiAlternatives, order, user, **kw
 
 @receiver(global_email_filter, dispatch_uid="pretix_bounces_email_filter_global")
 def add_bounce_sender_global(sender, message: EmailMultiAlternatives, order, user, **kwargs):
-    if not settings.CONFIG_FILE.has_section('bounces') or order:
+    if not settings.CONFIG_FILE.has_section('bounces') or order or not user:
         return message
 
     from_domain = settings.CONFIG_FILE.get('bounces', 'from_domain', fallback='')
