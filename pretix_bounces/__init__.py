@@ -1,4 +1,3 @@
-from django.apps import AppConfig
 from django.conf import settings
 
 try:
@@ -7,7 +6,7 @@ except ImportError:
     raise RuntimeError("Please use pretix 2.7 or above to run this plugin!")
 
 
-class PluginApp(AppConfig):
+class PluginApp(PluginConfig):
     name = 'pretix_bounces'
     verbose_name = 'Bounce processing for pretix'
 
