@@ -13,9 +13,13 @@ This requires an additional section in the ``pretix.cfg`` config file that looks
 
     [bounces]
     alias=noreply-%s@mydomain.com
+    from_domain=mydomain.com
     server=mail.mydomain.com:993
     user=noreply@mydomain.com
     pass=12345678
+
+The plugin will only be effective for mails sent through the system default mailer (specified in the same file), not
+for events with a custom SMTP server.
 
 Development setup
 -----------------
