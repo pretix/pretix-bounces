@@ -9,7 +9,7 @@ from imaplib import IMAP4_SSL
 from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
 from django.dispatch import receiver
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from pretix.base.signals import email_filter, periodic_task, logentry_display, global_email_filter
 from .models import MailAlias
