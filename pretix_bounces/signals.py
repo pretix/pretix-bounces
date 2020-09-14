@@ -69,6 +69,8 @@ def add_bounce_sender_global(sender, message: EmailMultiAlternatives, order, use
 @receiver(periodic_task, dispatch_uid="pretix_bounces_periodic")
 @scopes_disabled()
 def get_bounces_via_imap(sender, **kwargs):
+    if not settings.CONFIG_FILE.has_section('bounces'):
+        return
     host = settings.CONFIG_FILE.get('bounces', 'server', fallback='localhost').split(":")[0]
     try:
         port = settings.CONFIG_FILE.get('bounces', 'server', fallback='localhost').split(":")[1]
