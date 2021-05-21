@@ -26,6 +26,16 @@ def generate_new_user_alias(user):
             return a.sender
 
 
+def generate_new_customer_alias(customer):
+    while True:
+        alias = settings.CONFIG_FILE.get('bounces', 'alias') % get_random_string(16)
+        with transaction.atomic():
+            if MailAlias.objects.filter(sender=alias).exists():
+                continue
+            a, created = MailAlias.objects.get_or_create(customer=customer, defaults={'sender': alias})
+            return a.sender
+
+
 def get_content(msg: Message):
     if msg.is_multipart():
         plain_body = html_body = None

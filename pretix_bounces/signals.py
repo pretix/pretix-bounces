@@ -13,7 +13,7 @@ from django.utils.translation import gettext_lazy as _
 
 from pretix.base.signals import email_filter, periodic_task, logentry_display, global_email_filter
 from .models import MailAlias
-from .utils import generate_new_alias, get_content, generate_new_user_alias
+from .utils import generate_new_alias, get_content, generate_new_user_alias, generate_new_customer_alias
 
 
 @receiver(email_filter, dispatch_uid="pretix_bounces_email_filter")
@@ -44,15 +44,20 @@ def add_bounce_sender(sender, message: EmailMultiAlternatives, order, user, **kw
 
 
 @receiver(global_email_filter, dispatch_uid="pretix_bounces_email_filter_global")
-def add_bounce_sender_global(sender, message: EmailMultiAlternatives, order, user, **kwargs):
-    if not settings.CONFIG_FILE.has_section('bounces') or order or not user:
+def add_bounce_sender_global(sender, message: EmailMultiAlternatives, order, user, customer, **kwargs):
+    if not settings.CONFIG_FILE.has_section('bounces') or order:
         return message
 
     from_domain = settings.CONFIG_FILE.get('bounces', 'from_domain', fallback='')
     if from_domain and '@' + from_domain not in message.from_email:
         return message
 
-    alias = generate_new_user_alias(user)
+    if user:
+        alias = generate_new_user_alias(user)
+    elif customer:
+        alias = generate_new_customer_alias(customer)
+    else:
+        return message
     from_email = message.from_email
 
     if 'Reply-To' not in message.extra_headers:
@@ -99,6 +104,16 @@ def get_bounces_via_imap(sender, **kwargs):
             if alias.user:
                 alias.user.log_action(
                     'pretix_bounces.user.email.received',
+                    data={
+                        'subject': msg['Subject'],
+                        'message': content,
+                        'sender': msg['Sender'],
+                        'full_mail': data[0][1].decode()
+                    }
+                )
+            if alias.customer:
+                alias.customer.log_action(
+                    'pretix_bounces.order.email.received',
                     data={
                         'subject': msg['Subject'],
                         'message': content,
