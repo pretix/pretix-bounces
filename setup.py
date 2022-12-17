@@ -3,6 +3,7 @@ from distutils.command.build import build
 
 from django.core import management
 from setuptools import setup, find_packages
+from pretix_bounces import __version__
 
 
 try:
@@ -25,7 +26,7 @@ cmdclass = {
 
 setup(
     name='pretix-bounces',
-    version='1.3.0',
+    version=__version__,
     description='Allows automatic processing of bounces or automatic replies to emails sent by pretix.',
     long_description=long_description,
     url='https://github.com/pretix/pretix-bounces',
