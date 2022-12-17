@@ -1,4 +1,5 @@
 from django.conf import settings
+
 from . import __version__
 
 try:

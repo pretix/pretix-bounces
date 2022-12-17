@@ -1,19 +1,22 @@
-from datetime import timedelta
-
 import email
-from django.utils.timezone import now
-from django_scopes import scopes_disabled
-from email.utils import getaddresses
-from imaplib import IMAP4_SSL
-
+from datetime import timedelta
 from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
 from django.dispatch import receiver
+from django.utils.timezone import now
 from django.utils.translation import gettext_lazy as _
+from django_scopes import scopes_disabled
+from email.utils import getaddresses
+from imaplib import IMAP4_SSL
+from pretix.base.signals import (
+    email_filter, global_email_filter, logentry_display, periodic_task,
+)
 
-from pretix.base.signals import email_filter, periodic_task, logentry_display, global_email_filter
 from .models import MailAlias
-from .utils import generate_new_alias, get_content, generate_new_user_alias, generate_new_customer_alias
+from .utils import (
+    generate_new_alias, generate_new_customer_alias, generate_new_user_alias,
+    get_content,
+)
 
 
 @receiver(email_filter, dispatch_uid="pretix_bounces_email_filter")

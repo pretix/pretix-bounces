@@ -1,8 +1,7 @@
-from email.message import Message
-
 from django.conf import settings
 from django.db import transaction
 from django.utils.crypto import get_random_string
+from email.message import Message
 
 from .models import MailAlias
 
