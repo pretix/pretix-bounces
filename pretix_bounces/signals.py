@@ -69,7 +69,6 @@ def add_bounce_sender_global(sender, message: EmailMultiAlternatives, order, use
     message.from_email = alias
     message.extra_headers.update({
         'From': from_email,
-        'Sender': alias
     })
     return message
 
