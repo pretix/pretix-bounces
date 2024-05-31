@@ -7,14 +7,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('pretixbase', '0188_delete_requiredaction'),
-        ('pretix_bounces', '0002_auto_20190830_0932'),
+        ("pretixbase", "0188_delete_requiredaction"),
+        ("pretix_bounces", "0002_auto_20190830_0932"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='mailalias',
-            name='customer',
-            field=models.OneToOneField(null=True, on_delete=django.db.models.deletion.CASCADE, to='pretixbase.customer'),
+            model_name="mailalias",
+            name="customer",
+            field=models.OneToOneField(
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="pretixbase.customer",
+            ),
         ),
     ]

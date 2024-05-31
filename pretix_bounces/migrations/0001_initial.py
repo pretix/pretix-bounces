@@ -11,17 +11,31 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('pretixbase', '0076_orderfee_squashed_0082_invoiceaddress_internal_reference'),
+        ("pretixbase", "0076_orderfee_squashed_0082_invoiceaddress_internal_reference"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='MailAlias',
+            name="MailAlias",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('sender', models.EmailField(max_length=254, unique=True)),
-                ('datetime', models.DateTimeField(auto_now_add=True)),
-                ('order', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='pretixbase.Order')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("sender", models.EmailField(max_length=254, unique=True)),
+                ("datetime", models.DateTimeField(auto_now_add=True)),
+                (
+                    "order",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="pretixbase.Order",
+                    ),
+                ),
             ],
         ),
     ]
