@@ -8,8 +8,10 @@ from django.utils.translation import gettext_lazy as _
 from django_scopes import scopes_disabled
 from email.utils import getaddresses
 from imaplib import IMAP4_SSL
+from pretix.base.logentrytype_registry import LogEntryType, log_entry_types
+from pretix.base.logentrytypes import OrderLogEntryType
 from pretix.base.signals import (
-    email_filter, global_email_filter, logentry_display, periodic_task,
+    email_filter, global_email_filter, periodic_task,
 )
 
 from .models import MailAlias
@@ -142,20 +144,22 @@ def get_bounces_via_imap(sender, **kwargs):
     imap.logout()
 
 
-@receiver(signal=logentry_display, dispatch_uid="pretix_bounces_logentry_display")
-def pretixcontrol_logentry_display(sender, logentry, **kwargs):
-    event_type = logentry.action_type
-    plains = {
-        "pretix_bounces.order.email.received": _(
-            "An email reply has been received by the user."
-        ),
-        "pretix_bounces.user.email.received": _(
-            "An email reply has been received by the user."
-        ),
-    }
+@log_entry_types.new_from_dict({
+    "pretix_bounces.order.email.received": _(
+        "An email reply has been received by the user."
+    ),
+})
+class OrderBounceLogEntryType(OrderLogEntryType):
+    pass
 
-    if event_type in plains:
-        return plains[event_type]
+
+@log_entry_types.new_from_dict({
+    "pretix_bounces.user.email.received": _(
+        "An email reply has been received by the user."
+    ),
+})
+class ZserBounceLogEntryType(LogEntryType):
+    pass
 
 
 @receiver(periodic_task, dispatch_uid="pretix_bounces_periodic_cleanup")
