@@ -158,7 +158,7 @@ class OrderBounceLogEntryType(OrderLogEntryType):
         "An email reply has been received by the user."
     ),
 })
-class ZserBounceLogEntryType(LogEntryType):
+class UserBounceLogEntryType(LogEntryType):
     pass
 
 
