@@ -10,58 +10,25 @@ from email.utils import getaddresses
 from imaplib import IMAP4_SSL
 from pretix.base.logentrytype_registry import LogEntryType, log_entry_types
 from pretix.base.logentrytypes import OrderLogEntryType
-from pretix.base.signals import (
-    email_filter, global_email_filter, periodic_task,
-)
+from pretix.base.models import OutgoingMail
+from pretix.base.signals import global_email_filter, periodic_task
 
 from .models import MailAlias
-from .utils import (
-    generate_new_alias, generate_new_customer_alias, generate_new_user_alias,
-    get_content,
-)
-
-
-@receiver(email_filter, dispatch_uid="pretix_bounces_email_filter")
-def add_bounce_sender(sender, message: EmailMultiAlternatives, order, user, **kwargs):
-    if not settings.CONFIG_FILE.has_section("bounces") or not order:
-        return message
-
-    if order.event.settings.smtp_use_custom:
-        return message
-
-    from_domain = settings.CONFIG_FILE.get("bounces", "from_domain", fallback="")
-    if from_domain and "@" + from_domain not in message.from_email:
-        return message
-
-    alias = generate_new_alias(order)
-    from_email = message.from_email
-
-    if "Reply-To" not in message.extra_headers:
-        message.extra_headers["Reply-To"] = from_email
-
-    message.from_email = alias
-    message.extra_headers.update({"From": from_email, "Sender": alias})
-
-    return message
+from .utils import generate_new_alias, get_content
 
 
 @receiver(global_email_filter, dispatch_uid="pretix_bounces_email_filter_global")
 def add_bounce_sender_global(
-    sender, message: EmailMultiAlternatives, order, user, customer, **kwargs
+    sender, message: EmailMultiAlternatives, outgoing_mail, **kwargs
 ):
-    if not settings.CONFIG_FILE.has_section("bounces") or order:
+    if not settings.CONFIG_FILE.has_section("bounces"):
         return message
 
     from_domain = settings.CONFIG_FILE.get("bounces", "from_domain", fallback="")
     if from_domain and "@" + from_domain not in message.from_email:
         return message
 
-    if user:
-        alias = generate_new_user_alias(user)
-    elif customer:
-        alias = generate_new_customer_alias(customer)
-    else:
-        return message
+    alias = generate_new_alias(outgoing_mail)
     from_email = message.from_email
 
     if "Reply-To" not in message.extra_headers:
@@ -110,34 +77,42 @@ def get_bounces_via_imap(sender, **kwargs):
             content = get_content(msg)
             if isinstance(content, bytes):
                 content = content.decode(errors="replace")
-            if alias.user:
-                alias.user.log_action(
+            full_mail = data[0][1].decode()
+
+            if alias.outgoing_mail:
+                alias.outgoing_mail.status = OutgoingMail.STATUS_BOUNCED
+                alias.outgoing_mail.error = "Bounce received"
+                alias.outgoing_mail.error_detail = full_mail
+                alias.outgoing_mail.save(update_fields=["status", "error", "error_detail", "sent"])
+
+            if user := (alias.outgoing_mail.user if alias.outgoing_mail else alias.user):
+                user.log_action(
                     "pretix_bounces.user.email.received",
                     data={
                         "subject": msg["Subject"],
                         "message": content,
                         "sender": msg["Sender"],
-                        "full_mail": data[0][1].decode(),
+                        "full_mail": full_mail,
                     },
                 )
-            if alias.customer:
-                alias.customer.log_action(
+            if customer := (alias.outgoing_mail.customer if alias.outgoing_mail else alias.customer):
+                customer.log_action(
                     "pretix_bounces.order.email.received",
                     data={
                         "subject": msg["Subject"],
                         "message": content,
                         "sender": msg["Sender"],
-                        "full_mail": data[0][1].decode(),
+                        "full_mail": full_mail,
                     },
                 )
-            if alias.order:
-                alias.order.log_action(
+            if order := (alias.outgoing_mail.order if alias.outgoing_mail else alias.order):
+                order.log_action(
                     "pretix_bounces.order.email.received",
                     data={
                         "subject": msg["Subject"],
                         "message": content,
                         "sender": msg["Sender"],
-                        "full_mail": data[0][1].decode(),
+                        "full_mail": full_mail,
                     },
                 )
     imap.close()
