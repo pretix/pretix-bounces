@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.db import transaction
+from django.db import transaction, IntegrityError
 from django.utils.crypto import get_random_string
 from email.message import Message
 
@@ -10,12 +10,16 @@ def generate_new_alias(outgoing_mail):
     while True:
         alias = settings.CONFIG_FILE.get("bounces", "alias") % get_random_string(16)
         with transaction.atomic():
-            a, created = MailAlias.objects.get_or_create(
-                sender=alias,
-                outgoing_mail=outgoing_mail,
-            )
-            if created:
-                return alias
+            try:
+                a, created = MailAlias.objects.get_or_create(
+                    outgoing_mail=outgoing_mail,
+                    defaults={
+                        "sender": alias,
+                    }
+                )
+            except IntegrityError:
+                pass
+            return a.sender
 
 
 def get_content(msg: Message):
