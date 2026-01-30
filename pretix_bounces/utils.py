@@ -11,7 +11,8 @@ def generate_new_alias(outgoing_mail):
         alias = settings.CONFIG_FILE.get("bounces", "alias") % get_random_string(16)
         with transaction.atomic():
             a, created = MailAlias.objects.get_or_create(
-                sender=alias, defaults={"outgoing_mail": outgoing_mail}
+                sender=alias,
+                outgoing_mail=outgoing_mail,
             )
             if created:
                 return alias
