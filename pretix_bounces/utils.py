@@ -6,39 +6,15 @@ from email.message import Message
 from .models import MailAlias
 
 
-def generate_new_alias(order):
+def generate_new_alias(outgoing_mail):
     while True:
         alias = settings.CONFIG_FILE.get("bounces", "alias") % get_random_string(16)
         with transaction.atomic():
             a, created = MailAlias.objects.get_or_create(
-                sender=alias, defaults={"order": order}
+                sender=alias, defaults={"outgoing_mail": outgoing_mail}
             )
             if created:
                 return alias
-
-
-def generate_new_user_alias(user):
-    while True:
-        alias = settings.CONFIG_FILE.get("bounces", "alias") % get_random_string(16)
-        with transaction.atomic():
-            if MailAlias.objects.filter(sender=alias).exists():
-                continue
-            a, created = MailAlias.objects.get_or_create(
-                user=user, defaults={"sender": alias}
-            )
-            return a.sender
-
-
-def generate_new_customer_alias(customer):
-    while True:
-        alias = settings.CONFIG_FILE.get("bounces", "alias") % get_random_string(16)
-        with transaction.atomic():
-            if MailAlias.objects.filter(sender=alias).exists():
-                continue
-            a, created = MailAlias.objects.get_or_create(
-                customer=customer, defaults={"sender": alias}
-            )
-            return a.sender
 
 
 def get_content(msg: Message):
