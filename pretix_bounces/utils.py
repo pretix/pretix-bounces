@@ -6,9 +6,14 @@ from email.message import Message
 from .models import MailAlias
 
 
-def generate_new_alias(outgoing_mail):
+def generate_new_alias(outgoing_mail, sender_domain):
+    tpl = settings.CONFIG_FILE.get("bounces", "alias")
     while True:
-        alias = settings.CONFIG_FILE.get("bounces", "alias") % get_random_string(16)
+        if tpl.count("%s") > 1:
+            alias = tpl % (get_random_string(16), sender_domain)
+        else:
+            alias = tpl % get_random_string(16)
+
         with transaction.atomic():
             try:
                 a, created = MailAlias.objects.get_or_create(

@@ -24,11 +24,12 @@ def add_bounce_sender_global(
     if not settings.CONFIG_FILE.has_section("bounces"):
         return message
 
-    from_domain = settings.CONFIG_FILE.get("bounces", "from_domain", fallback="")
-    if from_domain and "@" + from_domain not in message.from_email:
+    sender_domain = message.from_email.removesuffix(">").rsplit("@", 1)[-1]
+    from_domains = settings.CONFIG_FILE.get("bounces", "from_domain", fallback="").split(",")
+    if sender_domain.lower() not in from_domains:
         return message
 
-    alias = generate_new_alias(outgoing_mail)
+    alias = generate_new_alias(outgoing_mail, sender_domain)
     from_email = message.from_email
 
     if "Reply-To" not in message.extra_headers:

@@ -19,7 +19,8 @@ This requires an additional section in the ``pretix.cfg`` config file that looks
     pass=12345678
 
 The plugin will only be effective for mails sent through the system default mailer (specified in the same file), not
-for events with a custom SMTP server.
+for events with a custom SMTP server. ``from_domain`` can contain multiple comma-separated domains, in which case you
+can use a second ``%s`` placeholder in ``alias`` for the domain.
 
 Development setup
 -----------------
